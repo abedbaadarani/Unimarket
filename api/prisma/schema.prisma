@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  items     Item[]
+  favorites Favorite[]
+}
+
+model Item {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  category    String
+  sellerId    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  seller      User      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  photos      Photo[]
+  favorites   Favorite[]
+}
+
+model Photo {
+  id        Int      @id @default(autoincrement())
+  url       String
+  itemId    Int
+  createdAt DateTime @default(now())
+  
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  userId    Int
+  itemId    Int
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, itemId])
+}
+
