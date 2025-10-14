@@ -1,6 +1,6 @@
 # UniMarket
 
-A full-stack marketplace application for university students to buy and sell items. Built with React, Node.js, Express, Prisma, and PostgreSQL.
+A full-stack marketplace application to buy and sell items. Built with React, Node.js, Express, Prisma, and PostgreSQL.
 
 ## Project Structure
 
