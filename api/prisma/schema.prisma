@@ -11,17 +11,19 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  firstName String
-  lastName  String
-  phone     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  firstName   String
+  lastName    String
+  phone       String?
+  dateOfBirth DateTime?
+  address     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   
-  items     Item[]
-  favorites Favorite[]
+  items       Item[]
+  favorites   Favorite[]
 }
 
 model Item {

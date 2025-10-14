@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import Browse from './pages/Browse';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import PostItem from './pages/PostItem';
 import ItemDetails from './pages/ItemDetails';
 import Favorites from './pages/Favorites';
@@ -35,8 +37,10 @@ function AppRoutes() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/browse" element={<Browse />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/items/:id" element={<ItemDetails />} />
         
         {/* Protected Routes */}

@@ -26,6 +26,9 @@ const Navbar = () => {
                 <Link to="/" className="text-gray-700 hover:text-blue-600">
                   Home
                 </Link>
+                <Link to="/browse" className="text-gray-700 hover:text-blue-600">
+                  Browse
+                </Link>
                 <Link to="/post-item" className="text-gray-700 hover:text-blue-600">
                   Post Item
                 </Link>
@@ -46,6 +49,9 @@ const Navbar = () => {
               <>
                 <Link to="/" className="text-gray-700 hover:text-blue-600">
                   Home
+                </Link>
+                <Link to="/browse" className="text-gray-700 hover:text-blue-600">
+                  Browse
                 </Link>
                 <Link to="/login" className="btn-outline">
                   Login
