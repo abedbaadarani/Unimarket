@@ -21,9 +21,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Step 3: Verification
-  const [verificationCode, setVerificationCode] = useState('');
-  const [sentCode, setSentCode] = useState('');
+
   
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,7 +43,7 @@ const Register = () => {
     setCurrentStep(2);
   };
 
-  // Handle Step 2: Account Credentials and Send Verification Email
+  // Handle Step 2: Account Credentials and Registration
   const handleStep2Next = async (e) => {
     e.preventDefault();
     setError('');
@@ -58,39 +56,6 @@ const Register = () => {
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Generate a 6-digit verification code
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setSentCode(code);
-      
-      // Send verification email
-      await axios.post('http://localhost:5000/api/auth/send-verification', {
-        email,
-        code,
-        firstName
-      });
-      
-      setSuccess('Verification code sent to your email!');
-      setCurrentStep(3);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send verification email');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle Step 3: Verification and Account Creation
-  const handleVerification = async (e) => {
-    e.preventDefault();
-    setError('');
-    
-    if (verificationCode !== sentCode) {
-      setError('Invalid verification code');
       return;
     }
 
@@ -148,15 +113,6 @@ const Register = () => {
                 </div>
                 <span className="text-xs mt-2 text-gray-600">Account</span>
               </div>
-              <div className={`flex-1 h-1 ${currentStep >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-              <div className="flex flex-col items-center flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
-                }`}>
-                  3
-                </div>
-                <span className="text-xs mt-2 text-gray-600">Verify</span>
-              </div>
             </div>
           </div>
 
@@ -164,12 +120,10 @@ const Register = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               {currentStep === 1 && 'Personal Information'}
               {currentStep === 2 && 'Create Account'}
-              {currentStep === 3 && 'Verify Email'}
             </h2>
             <p className="text-gray-600">
               {currentStep === 1 && 'Tell us about yourself'}
               {currentStep === 2 && 'Set up your credentials'}
-              {currentStep === 3 && 'Enter the code sent to your email'}
             </p>
           </div>
 
@@ -442,73 +396,7 @@ const Register = () => {
                     </div>
                   ) : (
                     <span className="flex items-center justify-center">
-                      Next
-                      <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </span>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* Step 3: Verification Code */}
-          {currentStep === 3 && (
-            <form onSubmit={handleVerification} className="space-y-5">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <p className="text-gray-600">
-                  We've sent a 6-digit verification code to<br />
-                  <span className="font-semibold text-gray-900">{email}</span>
-                </p>
-              </div>
-
-              {/* Verification Code Input */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  className="modern-input text-center text-2xl tracking-widest font-bold"
-                  placeholder="000000"
-                  maxLength="6"
-                  required
-                />
-              </div>
-
-              {/* Navigation Buttons */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-300"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 modern-button group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Verifying...
-                    </div>
-                  ) : (
-                    <span className="flex items-center justify-center">
-                      Verify & Create Account
+                      Create Account
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -516,19 +404,10 @@ const Register = () => {
                   )}
                 </button>
               </div>
-
-              {/* Resend Code Link */}
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={handleStep2Next}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Didn't receive the code? Resend
-                </button>
-              </div>
             </form>
           )}
+
+
 
           {/* Divider */}
           {currentStep === 1 && (

@@ -5,22 +5,14 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// Configure multer for file upload using memory storage
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedTypes.test(file.mimetype);
-  
+
   if (mimetype && extname) {
     return cb(null, true);
   } else {
@@ -40,9 +32,14 @@ router.post('/', authMiddleware, upload.single('image'), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    
-    const url = `/uploads/${req.file.filename}`;
-    
+
+    // Convert buffer to base64 string
+    const base64String = req.file.buffer.toString('base64');
+    const mimeType = req.file.mimetype;
+
+    // Create data URI
+    const url = `data:${mimeType};base64,${base64String}`;
+
     res.status(201).json({ url });
   } catch (error) {
     console.error('Upload error:', error);

@@ -20,7 +20,7 @@ const Browse = () => {
       const params = {};
       if (search) params.search = search;
       if (category) params.category = category;
-      
+
       const response = await itemsAPI.getAll(params);
       setItems(response.data.items);
     } catch (error) {
@@ -34,7 +34,7 @@ const Browse = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Browse Items</h1>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <input
             type="text"
@@ -43,7 +43,7 @@ const Browse = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="input flex-1"
           />
-          
+
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -74,9 +74,13 @@ const Browse = () => {
               <div className="aspect-square bg-gray-200 relative">
                 {item.photos && item.photos.length > 0 ? (
                   <img
-                    src={`http://localhost:5000${item.photos[0].url}`}
+                    src={item.photos[0].url.startsWith('data:') || item.photos[0].url.startsWith('http') ? item.photos[0].url : `http://localhost:5000${item.photos[0].url}`}
                     alt={item.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x400?text=Image+Not+Found';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -84,7 +88,7 @@ const Browse = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
                   {item.title}

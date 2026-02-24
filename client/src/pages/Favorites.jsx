@@ -44,9 +44,13 @@ const Favorites = () => {
               <div className="aspect-square bg-gray-200 relative">
                 {item.photos && item.photos.length > 0 ? (
                   <img
-                    src={`http://localhost:5000${item.photos[0].url}`}
+                    src={item.photos[0].url.startsWith('data:') || item.photos[0].url.startsWith('http') ? item.photos[0].url : `http://localhost:5000${item.photos[0].url}`}
                     alt={item.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x400?text=Image+Not+Found';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -54,7 +58,7 @@ const Favorites = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
                   {item.title}

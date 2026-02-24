@@ -17,48 +17,11 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Send verification email
-router.post('/send-verification', async (req, res) => {
-  try {
-    const { email, code, firstName } = req.body;
-    
-    if (!email || !code) {
-      return res.status(400).json({ message: 'Email and code are required' });
-    }
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@unimarket.com',
-      to: email,
-      subject: 'UniMarket - Email Verification Code',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Welcome to UniMarket${firstName ? ', ' + firstName : ''}!</h2>
-          <p style="font-size: 16px; color: #374151;">Thank you for signing up. Please use the verification code below to complete your registration:</p>
-          <div style="background: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
-            <h1 style="color: #1f2937; letter-spacing: 8px; font-size: 36px; margin: 0;">${code}</h1>
-          </div>
-          <p style="font-size: 14px; color: #6b7280;">This code will expire in 10 minutes.</p>
-          <p style="font-size: 14px; color: #6b7280;">If you didn't request this code, please ignore this email.</p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-          <p style="font-size: 12px; color: #9ca3af; text-align: center;">© 2025 UniMarket. All rights reserved.</p>
-        </div>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-    
-    res.json({ message: 'Verification code sent successfully' });
-  } catch (error) {
-    console.error('Send verification error:', error);
-    res.status(500).json({ message: 'Failed to send verification email. Please try again.' });
-  }
-});
-
 // Forgot Password - Send reset link
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
     }
@@ -72,10 +35,10 @@ router.post('/forgot-password', async (req, res) => {
 
     // Generate reset token (6-digit code)
     const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     // In production, you should store this token in the database with expiration
     // For now, we'll send it via email
-    
+
     const resetLink = `http://localhost:3001/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
@@ -109,7 +72,7 @@ router.post('/forgot-password', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    
+
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
   } catch (error) {
     console.error('Forgot password error:', error);
@@ -121,7 +84,7 @@ router.post('/forgot-password', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, token, newPassword } = req.body;
-    
+
     if (!email || !token || !newPassword) {
       return res.status(400).json({ message: 'Email, token, and new password are required' });
     }
@@ -144,13 +107,13 @@ router.post('/reset-password', async (req, res) => {
 
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
+
     // Update password
     await prisma.user.update({
       where: { email },
       data: { password: hashedPassword }
     });
-    
+
     res.json({ message: 'Password successfully reset. You can now login with your new password.' });
   } catch (error) {
     console.error('Reset password error:', error);
@@ -162,18 +125,18 @@ router.post('/reset-password', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { email, password, firstName, lastName, phone, dateOfBirth, address } = req.body;
-    
+
     if (!email || !password || !firstName || !lastName || !phone) {
       return res.status(400).json({ error: 'All required fields must be filled' });
     }
-    
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -195,11 +158,11 @@ router.post('/register', async (req, res) => {
         createdAt: true,
       },
     });
-    
+
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });
-    
+
     res.status(201).json({ user, token });
   } catch (error) {
     console.error('Register error:', error);
@@ -211,27 +174,27 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
-    
+
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });
-    
+
     const { password: _, ...userWithoutPassword } = user;
-    
+
     res.json({ user: userWithoutPassword, token });
   } catch (error) {
     console.error('Login error:', error);
@@ -253,11 +216,11 @@ router.get('/me', authMiddleware, async (req, res) => {
         createdAt: true,
       },
     });
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     res.json({ user });
   } catch (error) {
     console.error('Get user error:', error);

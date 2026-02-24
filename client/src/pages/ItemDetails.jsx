@@ -7,7 +7,7 @@ const ItemDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  
+
   const [item, setItem] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -104,9 +104,13 @@ const ItemDetails = () => {
           <div className="aspect-square bg-gray-200 rounded-lg mb-4 overflow-hidden">
             {item.photos && item.photos.length > 0 ? (
               <img
-                src={`http://localhost:5000${item.photos[currentPhotoIndex].url}`}
+                src={item.photos[currentPhotoIndex].url.startsWith('data:') || item.photos[currentPhotoIndex].url.startsWith('http') ? item.photos[currentPhotoIndex].url : `http://localhost:5000${item.photos[currentPhotoIndex].url}`}
                 alt={item.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -121,14 +125,17 @@ const ItemDetails = () => {
                 <button
                   key={photo.id}
                   onClick={() => setCurrentPhotoIndex(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                    index === currentPhotoIndex ? 'border-blue-600' : 'border-gray-300'
-                  }`}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${index === currentPhotoIndex ? 'border-blue-600' : 'border-gray-300'
+                    }`}
                 >
                   <img
-                    src={`http://localhost:5000${photo.url}`}
+                    src={photo.url.startsWith('data:') || photo.url.startsWith('http') ? photo.url : `http://localhost:5000${photo.url}`}
                     alt={`${item.title} ${index + 1}`}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/150x150?text=Not+Found';
+                    }}
                   />
                 </button>
               ))}

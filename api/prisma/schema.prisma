@@ -43,7 +43,7 @@ model Item {
 
 model Photo {
   id        Int      @id @default(autoincrement())
-  url       String
+  url       String   @db.Text
   itemId    Int
   createdAt DateTime @default(now())
   

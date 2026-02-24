@@ -14,7 +14,7 @@ const PostItem = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
 
   const handleFileUpload = async (e) => {
@@ -143,7 +143,7 @@ const PostItem = () => {
 
           <div>
             <label className="label">Photos</label>
-            
+
             <div className="space-y-3">
               <div className="flex gap-2">
                 <input
@@ -181,7 +181,7 @@ const PostItem = () => {
                 {photos.map((photo, index) => (
                   <div key={index} className="relative aspect-square">
                     <img
-                      src={photo.startsWith('http') ? photo : `http://localhost:5000${photo}`}
+                      src={photo.startsWith('data:') || photo.startsWith('http') ? photo : `http://localhost:5000${photo}`}
                       alt={`Photo ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg"
                     />
